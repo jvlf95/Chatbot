@@ -1,10 +1,40 @@
 import discord
 from discord.ext import commands
+import requests
+import json
 
 # Intents -> permissões que o discord precisa para funcionar, e estou guardando as permissões dentro da variável intents
 intents = discord.Intents.all()
 # a variável bot representa o meu Bot e todas as suas propriedades
 bot = commands.Bot(".", intents=intents)
+# Qual modelo de IA estamos utilizando do OLLama
+MODEL_NAME = "mistral"
+# URL de acesso pode ser alterada caso queira mudar onde está a IA
+URL_IA = "http://localhost:11434/api/chat"
+
+def perguntar_ollama(pergunta):
+    url = URL_IA
+    payload = {
+        "model": MODEL_NAME,
+        "messages": [
+            {"role": "user", "content": pergunta}
+        ],
+        "stream": True
+    }
+
+    resposta = ""
+    with requests.post(url, json=payload, stream=True) as response:
+        for linha in response.iter_lines():
+            if linha:
+                dados = json.loads(linha.decode("utf-8"))
+                resposta += dados.get("message", {}).get("content", "")
+
+    return resposta.strip()
+
+#Por conta do limite de caracteres do Discord pode ser necessário dividir em partes
+def dividir_em_partes(texto, limite=2000):
+    return [texto[i:i+limite] for i in range(0, len(texto), limite)]
+
 
 # evento disparado quando o bot liga
 @bot.event
@@ -19,7 +49,16 @@ async def on_message(msg:discord.Message):
     # evita que o evento se repita quando vê a mensagem do próprio bot
     if msg.author.bot:
         return
-    await msg.reply(f"O usuário {msg.author.name} chegou no canal {msg.channel.name}")
+
+    #Se a mesagem começar com esse comando vai ser direcionada a IA
+    if msg.content.startswith('!pergunta'):
+        pergunta = msg.content[len('!pergunta '):].strip()
+        
+        await msg.channel.send("Pensando...")
+        resposta = perguntar_ollama(pergunta)
+        partes = dividir_em_partes(resposta)
+        for parte in partes:
+            await msg.channel.send(parte)
 
 @bot.event
 # membro --> objeto que representa um novo membro
@@ -49,6 +88,6 @@ async def falar(ctx:commands.Context,num1,num2):
     num2_int = int(num2)
     await ctx.reply(f"A soma entre {num1_int} e {num2_int} é igual a {num1_int+num2_int}")
 
-
+    
 # esse comando executa todo o código, por isso precisa ficar no final do código 
 bot.run("")
