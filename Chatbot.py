@@ -2,6 +2,8 @@ import discord
 from discord.ext import commands
 import requests
 import json
+from dotenv import load_dotenv
+import os
 
 # Intents -> permissões que o discord precisa para funcionar, e estou guardando as permissões dentro da variável intents
 intents = discord.Intents.all()
@@ -19,7 +21,7 @@ def perguntar_ollama(pergunta):
         "messages": [
             {"role": "user", "content": pergunta}
         ],
-        "stream": True
+        "stream": True,
     }
 
     resposta = ""
@@ -81,13 +83,14 @@ async def ola(ctx:commands.Context):
     await ctx.reply(f"Olá {nome}!")
     await ctx.send("Em que posso te ajudar?")
 
-@bot.command()
-# comando que faz o bot pegar o texto do usuário e copiar e colar
-async def falar(ctx:commands.Context,num1,num2):
-    num1_int = int(num1)
-    num2_int = int(num2)
-    await ctx.reply(f"A soma entre {num1_int} e {num2_int} é igual a {num1_int+num2_int}")
+# @bot.command()
+# # comando que faz o bot pegar o texto do usuário e copiar e colar
+# async def falar(ctx:commands.Context,num1,num2):
+#     num1_int = int(num1)
+#     num2_int = int(num2)
+#     await ctx.reply(f"A soma entre {num1_int} e {num2_int} é igual a {num1_int+num2_int}")
 
-    
 # esse comando executa todo o código, por isso precisa ficar no final do código 
-bot.run("")
+load_dotenv()
+TOKEN = os.getenv("DISCORD_TOKEN")
+bot.run(TOKEN)
