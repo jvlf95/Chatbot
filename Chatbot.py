@@ -92,5 +92,5 @@ async def ola(ctx:commands.Context):
 
 # esse comando executa todo o código, por isso precisa ficar no final do código 
 load_dotenv()
-TOKEN = os.getenv("DISCORD_TOKEN")
+TOKEN = os.getenv("")
 bot.run(TOKEN)
