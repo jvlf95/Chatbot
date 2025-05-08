@@ -2,7 +2,6 @@ import discord
 from discord.ext import commands
 import requests
 import json
-from dotenv import load_dotenv
 import os
 
 # Intents -> permissões que o discord precisa para funcionar, e estou guardando as permissões dentro da variável intents
@@ -90,7 +89,5 @@ async def ola(ctx:commands.Context):
 #     num2_int = int(num2)
 #     await ctx.reply(f"A soma entre {num1_int} e {num2_int} é igual a {num1_int+num2_int}")
 
-# esse comando executa todo o código, por isso precisa ficar no final do código 
-load_dotenv()
-TOKEN = os.getenv("")
-bot.run(TOKEN)
+
+bot.run("")
